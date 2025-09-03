@@ -51,7 +51,6 @@ android {
     buildFeatures {
         compose = true
     }
-
 }
 
 dependencies {
@@ -75,9 +74,18 @@ dependencies {
 
     // HILT / DI
     implementation(libs.hilt.android)
-    implementation(libs.firebase.firestore)
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // FIREBASE (con BOM)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+
+    // ZXING
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android.embedded)
 
     // TESTING
     testImplementation(libs.junit)
@@ -92,8 +100,4 @@ dependencies {
 
     // MOCKING
     testImplementation(libs.mockk)
-
-    // ZXING
-    implementation("com.google.zxing:core:3.5.3")
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

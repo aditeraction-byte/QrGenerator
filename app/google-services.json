@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "928895206532",
-    "project_id": "qrgenerators-4ceb1",
-    "storage_bucket": "qrgenerators-4ceb1.firebasestorage.app"
+    "project_number": "1096116141308",
+    "project_id": "adit-qr",
+    "storage_bucket": "adit-qr.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:928895206532:android:60ae9487f90bad56adeed1",
+        "mobilesdk_app_id": "1:1096116141308:android:cb15e7310f9933a14a6b79",
         "android_client_info": {
           "package_name": "com.example.qrgenerator"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCjzEUe9q94ioc30vpne_0971HwnqoxjG0"
+          "current_key": "AIzaSyCGae8aIoGziZa1B92D6Q7ZSf5exFMjQUg"
         }
       ],
       "services": {
