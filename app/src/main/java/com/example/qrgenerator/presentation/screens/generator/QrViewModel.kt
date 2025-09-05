@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.qrgenerator.domain.usecase.GetQrByIdUseCase
-import com.example.qrgenerator.domain.usecase.UpdateRedirectUrlUseCase
+import com.example.qrgenerator.domain.usecase.qrGenerator.GetQrByIdUseCase
+import com.example.qrgenerator.domain.usecase.qrGenerator.UpdateRedirectUrlUseCase
 import com.example.qrgenerator.utils.helpers.QrHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

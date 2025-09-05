@@ -15,10 +15,13 @@ import com.example.qrgenerator.presentation.screens.qrStats.QrStatsScreen
 fun AppNavHost(){
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.Login.route){
-
-        composable(Screen.Login.route){
-            LoginScreen(navController)
+    NavHost(navController = navController, startDestination = Screen.Login.route) {
+        composable(Screen.Login.route) {
+            LoginScreen(onLoginSuccess = {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
+            })
         }
         composable(Screen.Home.route){
             HomeScreen(navController)
