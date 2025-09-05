@@ -26,7 +26,6 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     val uiState by viewModel.uiState.collectAsState()
 
-    // Fondo degradado
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +36,6 @@ fun LoginScreen(
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Card central
         Card(
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(8.dp),
@@ -122,7 +120,7 @@ fun LoginScreen(
             }
         }
 
-        // Overlay de Loading
+        // Overlay Loading
         if (uiState is LoginUIState.Loading) {
             Box(
                 modifier = Modifier
@@ -134,7 +132,6 @@ fun LoginScreen(
             }
         }
 
-        // Éxito: navegar a Home
         if (uiState is LoginUIState.Success) {
             LaunchedEffect(Unit) { onLoginSuccess() }
         }
