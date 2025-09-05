@@ -28,11 +28,7 @@ class LoginViewModel @Inject constructor(
         _uiState.value = LoginUIState.Loading
         try {
             val user = result()
-            _uiState.value = if (user != null) {
-                LoginUIState.Success(user)
-            } else {
-                LoginUIState.LoggedOut
-            }
+            _uiState.value = if (user != null) LoginUIState.Success(user) else LoginUIState.LoggedOut
         } catch (e: Exception) {
             _uiState.value = LoginUIState.Error(e.message ?: "Unknown error")
         }
@@ -41,39 +37,32 @@ class LoginViewModel @Inject constructor(
     fun login(email: String, password: String) {
         val cleanEmail = email.trim()
         val cleanPassword = password.trim()
-
         if (cleanEmail.isEmpty() || cleanPassword.isEmpty()) {
-            _uiState.value = LoginUIState.Error("Email y password no pueden estar vacíos")
+            _uiState.value = LoginUIState.Error("Email and password cannot be empty")
             return
         }
-
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(cleanEmail).matches()) {
-            _uiState.value = LoginUIState.Error("Email inválido")
+            _uiState.value = LoginUIState.Error("Invalid email")
             return
         }
-
         handleResult { loginUseCase(cleanEmail, cleanPassword) }
     }
 
     fun register(email: String, password: String) {
         val cleanEmail = email.trim()
         val cleanPassword = password.trim()
-
         if (cleanEmail.isEmpty() || cleanPassword.isEmpty()) {
-            _uiState.value = LoginUIState.Error("Email y password no pueden estar vacíos")
+            _uiState.value = LoginUIState.Error("Email and password cannot be empty")
             return
         }
-
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(cleanEmail).matches()) {
-            _uiState.value = LoginUIState.Error("Email inválido")
+            _uiState.value = LoginUIState.Error("Invalid email")
             return
         }
-
         if (cleanPassword.length < 6) {
-            _uiState.value = LoginUIState.Error("Password debe tener al menos 6 caracteres")
+            _uiState.value = LoginUIState.Error("Password must be at least 6 characters")
             return
         }
-
         handleResult { registerUseCase(cleanEmail, cleanPassword) }
     }
 
@@ -81,11 +70,10 @@ class LoginViewModel @Inject constructor(
         try {
             logoutUseCase()
             _uiState.value = LoginUIState.LoggedOut
-        } catch (e: Exception){
+        } catch (e: Exception) {
             _uiState.value = LoginUIState.Error(e.message ?: "Unknown error")
         }
     }
 
     fun getCurrentUser() = handleResult { getCurrentUserUseCase() }
-
 }
