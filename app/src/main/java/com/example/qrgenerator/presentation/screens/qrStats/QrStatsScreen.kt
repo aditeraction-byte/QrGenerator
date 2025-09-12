@@ -1,7 +1,9 @@
 package com.example.qrgenerator.presentation.screens.qrStats
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -10,11 +12,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @Composable
-fun QrStatsScreen(
-    qrId: String,
-    viewModel: QrStatsViewModel = hiltViewModel()
-) {
+fun QrStatsScreen(qrId: String, onBack: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("QR Stats Screen for ID: $qrId")
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Stats for QR: $qrId")
+            Button(onClick = onBack) {
+                Text("Back")
+            }
+        }
     }
 }

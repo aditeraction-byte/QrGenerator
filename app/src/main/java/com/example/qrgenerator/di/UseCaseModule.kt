@@ -3,10 +3,11 @@ package com.example.qrgenerator.di
 import com.example.qrgenerator.domain.repository.AuthRepository
 import com.example.qrgenerator.domain.repository.HomeRepository
 import com.example.qrgenerator.domain.repository.QrGeneratorRepository
+import com.example.qrgenerator.domain.repository.UserRepository
 import com.example.qrgenerator.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.qrgenerator.domain.usecase.auth.LoginUseCase
 import com.example.qrgenerator.domain.usecase.auth.LogoutUseCase
-import com.example.qrgenerator.domain.usecase.auth.RegisterUseCase
+import com.example.qrgenerator.domain.usecase.auth.RegisterAndCreateUserUseCase
 import com.example.qrgenerator.domain.usecase.home.AddQrUseCase
 import com.example.qrgenerator.domain.usecase.home.GetAllQrsUseCase
 import com.example.qrgenerator.domain.usecase.qrGenerator.CreateQrUseCase
@@ -48,8 +49,10 @@ object UseCaseModule {
         LoginUseCase(repository)
 
     @Provides
-    fun provideRegisterUseCase(repository: AuthRepository) =
-        RegisterUseCase(repository)
+    fun provideRegisterAndCreateUserUseCase(
+        authRepository: AuthRepository,
+        userRepository: UserRepository
+    ) = RegisterAndCreateUserUseCase(authRepository, userRepository)
 
     @Provides
     fun provideLogoutUseCase(repository: AuthRepository) =
