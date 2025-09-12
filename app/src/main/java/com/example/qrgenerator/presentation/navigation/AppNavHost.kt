@@ -15,7 +15,6 @@ import com.example.qrgenerator.presentation.screens.generator.QrScreen
 import com.example.qrgenerator.presentation.screens.home.HomeScreen
 import com.example.qrgenerator.presentation.screens.login.LoginScreen
 import com.example.qrgenerator.presentation.screens.qrStats.QrStatsScreen
-import com.google.common.base.Defaults.defaultValue
 
 @Composable
 fun AppNavHost() {
