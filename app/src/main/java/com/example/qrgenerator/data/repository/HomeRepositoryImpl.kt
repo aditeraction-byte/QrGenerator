@@ -1,6 +1,6 @@
 package com.example.qrgenerator.data.repository
 
-import android.util.Log
+
 import com.example.qrgenerator.data.mapper.toDomain
 import com.example.qrgenerator.data.mapper.toDto
 import com.example.qrgenerator.data.model.QrDto
