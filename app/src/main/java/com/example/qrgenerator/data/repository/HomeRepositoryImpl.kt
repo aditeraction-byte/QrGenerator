@@ -16,15 +16,14 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun getAllQrs(): List<QrDomain> {
         val snap = firestore.collection("home_qrs").get().await()
-        Log.d("HomeRepo", "Docs raw: ${snap.documents.map { it.data }}")
-        val list = snap.documents.mapNotNull {
-            it.toObject(QrDto::class.java)?.toDomain()
-        }
-        Log.d("HomeRepo", "Mapped list: $list")
-        return list
+        return snap.documents.mapNotNull { it.toObject(QrDto::class.java)?.toDomain() }
     }
 
     override suspend fun addQr(qr: QrDomain) {
         firestore.collection("home_qrs").document(qr.id).set(qr.toDto()).await()
+    }
+
+    override suspend fun deleteQr(qrId: String) {
+        firestore.collection("home_qrs").document(qrId).delete().await()
     }
 }

@@ -31,7 +31,10 @@ fun LoginScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF6A11CB), Color(0xFF2575FC))
+                    colors = listOf(
+                        Color(0xFF7A4DCC), // violeta suave
+                        Color(0xFF5AA0FF)  // azul suave
+                    )
                 )
             ),
         contentAlignment = Alignment.Center
@@ -51,7 +54,7 @@ fun LoginScreen(
                 Text(
                     text = "Welcome",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFF2575FC)
+                    color = Color(0xFF5AA0FF) // azul suave
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -84,7 +87,7 @@ fun LoginScreen(
                     enabled = uiState !is LoginUIState.Loading,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2575FC),
+                        containerColor = Color(0xFF5AA0FF), // azul suave
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp)
@@ -99,7 +102,7 @@ fun LoginScreen(
                     enabled = uiState !is LoginUIState.Loading,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6A11CB),
+                        containerColor = Color(0xFF7A4DCC), // violeta suave
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp)
@@ -132,6 +135,7 @@ fun LoginScreen(
             }
         }
 
+        // Success
         if (uiState is LoginUIState.Success) {
             LaunchedEffect(Unit) { onLoginSuccess() }
         }
