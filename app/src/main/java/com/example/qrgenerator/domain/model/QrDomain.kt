@@ -9,5 +9,6 @@ data class QrDomain(
     val expiresAt: Long? = null,
     val createdAt: Long = System.currentTimeMillis()
 ) {
-    val shortLink: String get() = "https://adit-qr.web.app/qr.html?id=$id"
+    val shortLink: String
+        get() = "https://adit-qr.web.app/qr.html?id=$id"
 }

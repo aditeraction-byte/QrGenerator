@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.example.qrgenerator.presentation.screens.generator.QrScreen
 import com.example.qrgenerator.presentation.screens.home.HomeScreen
 import com.example.qrgenerator.presentation.screens.login.LoginScreen
+import com.example.qrgenerator.presentation.screens.qrDetail.QrDetailsScreen
 import com.example.qrgenerator.presentation.screens.qrStats.QrStatsScreen
 
 @Composable
@@ -21,45 +22,26 @@ fun AppNavHost() {
     val navController = rememberNavController()
     var reloadTrigger by remember { mutableStateOf(false) }
 
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Login.route
-    ) {
-        // --- Login ---
+    NavHost(navController = navController, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
             LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
+                    navController.navigate(Screen.Home.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                 }
             )
         }
 
-        // --- Home ---
         composable(Screen.Home.route) {
             HomeScreen(
-                onCreateQr = { navController.navigate(Screen.QrGenerator.createRoute()) },
-                onQrDetail = { qrId -> navController.navigate(Screen.QrGenerator.createRoute(qrId)) },
+                onCreateQr = { navController.navigate(Screen.QrGenerator.route) },
+                onQrDetail = { qrId -> navController.navigate(Screen.QrDetails.createRoute(qrId)) },
                 onQrStats = { qrId -> navController.navigate(Screen.QrStats.createRoute(qrId)) },
                 reloadTrigger = reloadTrigger
             )
         }
 
-        // --- Generator (crear o editar) ---
-        composable(
-            route = Screen.QrGenerator.route,
-            arguments = listOf(
-                navArgument("qrId") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) { backStackEntry ->
-            val qrId = backStackEntry.arguments?.getString("qrId")
+        composable(Screen.QrGenerator.route) {
             QrScreen(
-                qrId = qrId,
                 onBack = {
                     navController.popBackStack()
                     reloadTrigger = !reloadTrigger
@@ -67,13 +49,17 @@ fun AppNavHost() {
             )
         }
 
-        // --- Stats ---
+        composable(
+            route = "qr_details/{qrId}",
+            arguments = listOf(navArgument("qrId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val qrId = backStackEntry.arguments?.getString("qrId") ?: return@composable
+            QrDetailsScreen(qrId = qrId, onBack = { navController.popBackStack() })
+        }
+
         composable(Screen.QrStats.route) { backStackEntry ->
             val qrId = backStackEntry.arguments?.getString("qrId") ?: ""
-            QrStatsScreen(
-                qrId = qrId,
-                onBack = { navController.popBackStack() }
-            )
+            QrStatsScreen(qrId = qrId, onBack = { navController.popBackStack() })
         }
     }
 }

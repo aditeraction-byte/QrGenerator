@@ -30,10 +30,8 @@ object UseCaseModule {
         GetQrByIdUseCase(repository)
 
     @Provides
-    fun provideCreateQrUseCase(
-        generatorRepo: QrGeneratorRepository,
-        homeRepo: HomeRepository
-    ) = CreateQrUseCase(generatorRepo, homeRepo)
+    fun provideCreateQrUseCase(repository: QrGeneratorRepository) =
+        CreateQrUseCase(repository)
 
     @Provides
     fun provideUpdateQrUseCase(repository: QrGeneratorRepository) =

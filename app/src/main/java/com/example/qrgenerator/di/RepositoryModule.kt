@@ -22,13 +22,15 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideQrGeneratorRepo(firestore: FirebaseFirestore): QrGeneratorRepository =
-        QrGeneratorRepositoryImpl(firestore)
+    fun provideQrGeneratorRepo(
+        firestore: FirebaseFirestore,
+        auth: FirebaseAuth
+    ): QrGeneratorRepository = QrGeneratorRepositoryImpl(firestore, auth)
 
     @Provides
     @Singleton
-    fun provideHomeRepo(firestore: FirebaseFirestore): HomeRepository =
-        HomeRepositoryImpl(firestore)
+    fun provideHomeRepo(firestore: FirebaseFirestore, auth: FirebaseAuth): HomeRepository =
+        HomeRepositoryImpl(firestore, auth)
 
     @Provides
     @Singleton

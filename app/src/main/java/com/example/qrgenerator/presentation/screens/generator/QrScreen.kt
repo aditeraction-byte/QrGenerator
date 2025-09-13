@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,8 +22,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.Composable
@@ -32,176 +38,113 @@ import androidx.core.graphics.toColorInt
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.qrgenerator.utils.helpers.QrHelper
+import kotlinx.coroutines.launch
 
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QrScreen(
-    viewModel: QrViewModel = hiltViewModel(),
-    qrId: String? = null,
-    onBack: () -> Unit
-) {
+fun QrScreen(viewModel: QrViewModel = hiltViewModel(), onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-
+    var shortlink by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var redirectUrl by remember { mutableStateOf("") }
-    var fgColor by remember { mutableStateOf("#000000") }
-    var bgColor by remember { mutableStateOf("#FFFFFF") }
-    var expires by remember { mutableStateOf(false) }
-    var expiresAt by remember { mutableStateOf<Long?>(null) }
 
-
-    LaunchedEffect(qrId) {
-        if (qrId != null) {
-            viewModel.loadQr(qrId)
-        } else {
-            viewModel.setNewQrState()
+    val qrBitmapPreview = remember(shortlink) {
+        try {
+            QrHelper.generateQrBitmap(
+                content = if (shortlink.isNotBlank()) "https://adit-qr.web.app/qr.html?id=$shortlink" else "preview",
+                fgColorHex = "#000000",
+                bgColorHex = "#FFFFFF",
+                size = 200
+            ).asImageBitmap()
+        } catch (e: Exception) {
+            null
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC)))),
-        contentAlignment = Alignment.Center
-    ) {
+
+    LaunchedEffect(uiState) {
         when (uiState) {
-            is QrUIState.Loading -> CircularProgressIndicator(color = Color.White)
+            is QrUIState.Success -> snackbarHostState.showSnackbar("QR created!")
+            is QrUIState.Error -> snackbarHostState.showSnackbar((uiState as QrUIState.Error).message)
+            else -> {}
+        }
+    }
 
-            is QrUIState.Error -> Text(
-                text = (uiState as QrUIState.Error).message,
-                color = Color.Red,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            is QrUIState.Success -> {
-                val qr = (uiState as QrUIState.Success).qr
-                val bmp = (uiState as QrUIState.Success).bitmap
-
-                LaunchedEffect(qr) {
-                    title = qr.title
-                    redirectUrl = qr.redirectUrl
-                    fgColor = qr.fgColor
-                    bgColor = qr.bgColor
-                    expiresAt = qr.expiresAt
-                    expires = qr.expiresAt != null
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .padding(vertical = 16.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(8.dp)
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, containerColor = Color.Transparent) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(Color(0xFF7A4DCC), Color(0xFF5AA0FF))))
+                .padding(padding),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(10.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "QR Generator",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Color(0xFF2575FC)
-                        )
+                    Text("QR Generator", style = MaterialTheme.typography.headlineSmall, color = Color.Black)
+                    Spacer(Modifier.height(20.dp))
 
-                        Spacer(Modifier.height(16.dp))
+                    val qrBitmapToShow = when (uiState) {
+                        is QrUIState.Success -> (uiState as QrUIState.Success).bitmap
+                        else -> qrBitmapPreview
+                    }
 
-                        Image(
-                            bitmap = bmp,
-                            contentDescription = "QR Code",
-                            modifier = Modifier.size(200.dp)
-                        )
+                    qrBitmapToShow?.let { Image(bitmap = it, contentDescription = "QR Preview", modifier = Modifier.size(200.dp)) }
 
+                    Spacer(Modifier.height(20.dp))
+
+                    OutlinedTextField(
+                        value = shortlink,
+                        onValueChange = { shortlink = it },
+                        label = { Text("Shortlink") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("QR Name") }, modifier = Modifier.fillMaxWidth())
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(value = redirectUrl, onValueChange = { redirectUrl = it }, label = { Text("Redirect URL") }, modifier = Modifier.fillMaxWidth())
+
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { viewModel.createQr(shortlink, title, redirectUrl) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5AA0FF), contentColor = Color.White),
+                        shape = RoundedCornerShape(12.dp)
+                    ) { Text("Create QR") }
+
+                    Spacer(Modifier.height(12.dp))
+                    Button(onClick = onBack, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7A4DCC), contentColor = Color.White), shape = RoundedCornerShape(12.dp)) {
+                        Text("Back")
+                    }
+
+                    if (uiState is QrUIState.Error) {
                         Spacer(Modifier.height(12.dp))
-
-                        OutlinedTextField(
-                            value = title,
-                            onValueChange = { title = it },
-                            label = { Text("QR Name") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        OutlinedTextField(
-                            value = redirectUrl,
-                            onValueChange = { redirectUrl = it },
-                            label = { Text("Redirect URL") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Row {
-                            ColorPicker(
-                                selectedColor = fgColor,
-                                onColorSelected = { fgColor = it },
-                                label = "Foreground"
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            ColorPicker(
-                                selectedColor = bgColor,
-                                onColorSelected = { bgColor = it },
-                                label = "Background"
-                            )
-                        }
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = expires,
-                                onCheckedChange = {
-                                    expires = it
-                                    expiresAt = if (it) System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000 else null
-                                }
-                            )
-                            Text("Expires in 7 days")
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Button(
-                            onClick = {
-                                if (qrId != null) {
-                                    viewModel.updateQr(title, redirectUrl, fgColor, bgColor, expiresAt)
-                                } else {
-                                    viewModel.createQr(title, redirectUrl, fgColor, bgColor, expiresAt)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2575FC),
-                                contentColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(if (qrId != null) "Update QR" else "Create QR")
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Button(
-                            onClick = onBack,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF6A11CB),
-                                contentColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("Back")
-                        }
+                        Text(text = (uiState as QrUIState.Error).message, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
@@ -209,32 +152,7 @@ fun QrScreen(
     }
 }
 
-@Composable
-fun ColorPicker(
-    selectedColor: String,
-    onColorSelected: (String) -> Unit,
-    label: String
-) {
-    val colors = listOf("#000000", "#FFFFFF", "#FF0000", "#00FF00", "#0000FF", "#FFFF00")
-    Column {
-        Text(label, color = Color.White)
-        Row(modifier = Modifier.padding(top = 4.dp)) {
-            colors.forEach { colorHex ->
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(Color(colorHex.toColorInt()))
-                        .border(
-                            width = if (colorHex == selectedColor) 2.dp else 0.dp,
-                            color = Color.White,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .clickable { onColorSelected(colorHex) }
-                        .padding(2.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-        }
-    }
-}
+
+
+
 

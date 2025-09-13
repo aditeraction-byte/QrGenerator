@@ -3,13 +3,12 @@ package com.example.qrgenerator.domain.usecase.qrGenerator
 import com.example.qrgenerator.domain.model.QrDomain
 import com.example.qrgenerator.domain.repository.HomeRepository
 import com.example.qrgenerator.domain.repository.QrGeneratorRepository
+import javax.inject.Inject
 
-class CreateQrUseCase(
-    private val generatorRepo: QrGeneratorRepository,
-    private val homeRepo: HomeRepository
+class CreateQrUseCase @Inject constructor(
+    private val repository: QrGeneratorRepository
 ) {
     suspend operator fun invoke(qr: QrDomain) {
-        generatorRepo.createQr(qr)
-        homeRepo.addQr(qr)
+        repository.createQr(qr)
     }
 }
