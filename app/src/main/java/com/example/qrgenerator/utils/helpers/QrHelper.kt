@@ -30,6 +30,7 @@ object QrHelper {
                 bitmap[x, y] = if (bitMatrix[x, y]) fgColor else bgColor
             }
         }
+
         return bitmap
     }
 }
