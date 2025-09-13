@@ -20,29 +20,40 @@ class QrGeneratorRepositoryImpl @Inject constructor(
             .document(auth.currentUser?.uid ?: throw Exception("User not logged in"))
             .collection("home_qrs")
 
-    override suspend fun getQrById(id: String): QrDomain {
-        val doc = userQrsPath().document(id).get().await()
-        return doc.toObject(QrDto::class.java)?.toDomain() ?: throw Exception("QR not found")
-    }
+    private val publicQrsPath = firestore.collection("public_qrs")
 
     override suspend fun createQr(qr: QrDomain) {
-        val docRef = userQrsPath().document(qr.id)
+        val qrWithOwner = qr.copy(ownerUid = auth.currentUser?.uid ?: "")
+        val docRef = publicQrsPath.document(qr.id)
         val snapshot = docRef.get().await()
 
         if (snapshot.exists()) {
             throw Exception("A QR with this Shortlink already exists")
         }
 
-        docRef.set(qr.toDto()).await()
+        docRef.set(qrWithOwner.toDto()).await()
+
+        userQrsPath().document(qr.id).set(mapOf("qrId" to qr.id)).await()
     }
 
-    override suspend fun updateQr(qr: QrDomain): QrDomain {
-        userQrsPath().document(qr.id).set(qr.toDto()).await()
-        return qr
+    override suspend fun getQrById(id: String): QrDomain {
+        val doc = publicQrsPath.document(id).get().await()
+        return doc.toObject(QrDto::class.java)?.toDomain() ?: throw Exception("QR not found")
     }
 
     override suspend fun getAllQrs(): List<QrDomain> {
-        val snap = userQrsPath().get().await()
+        val snap = publicQrsPath.get().await()
         return snap.documents.mapNotNull { it.toObject(QrDto::class.java)?.toDomain() }
+    }
+
+    override suspend fun updateQr(qr: QrDomain) {
+        val docRef = publicQrsPath.document(qr.id)
+        val snapshot = docRef.get().await()
+        if (!snapshot.exists()) throw Exception("QR not found")
+
+        val existing = snapshot.toObject(QrDto::class.java)?.toDomain()
+        if (existing?.ownerUid != auth.currentUser?.uid) throw Exception("Cannot edit a QR you do not own")
+
+        docRef.set(qr.toDto()).await()
     }
 }

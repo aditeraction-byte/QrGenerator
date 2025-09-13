@@ -3,6 +3,7 @@ package com.example.qrgenerator.di
 import com.example.qrgenerator.domain.repository.AuthRepository
 import com.example.qrgenerator.domain.repository.HomeRepository
 import com.example.qrgenerator.domain.repository.QrGeneratorRepository
+import com.example.qrgenerator.domain.repository.QrScanRepository
 import com.example.qrgenerator.domain.repository.UserRepository
 import com.example.qrgenerator.domain.usecase.auth.GetCurrentUserUseCase
 import com.example.qrgenerator.domain.usecase.auth.LoginUseCase
@@ -14,6 +15,7 @@ import com.example.qrgenerator.domain.usecase.qrGenerator.CreateQrUseCase
 import com.example.qrgenerator.domain.usecase.qrGenerator.GetAllGeneratorQrsUseCase
 import com.example.qrgenerator.domain.usecase.qrGenerator.GetQrByIdUseCase
 import com.example.qrgenerator.domain.usecase.qrGenerator.UpdateQrUseCase
+import com.example.qrgenerator.domain.usecase.stadistic.GetQrScansUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -68,4 +70,11 @@ object UseCaseModule {
     @Provides
     fun provideAddQrUseCase(repo: HomeRepository) =
         AddQrUseCase(repo)
+
+    // QrScan / Analytics Use Cases
+    @Provides
+    fun provideGetQrScansUseCase(repository: QrScanRepository) =
+        GetQrScansUseCase(repository)
+
+
 }

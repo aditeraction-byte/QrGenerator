@@ -12,19 +12,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val getAllQrs: GetAllQrsUseCase,
+    private val getAllQrsUseCase: GetAllQrsUseCase,
     private val deleteQrUseCase: DeleteQrUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUIState>(HomeUIState.Loading)
     val uiState: StateFlow<HomeUIState> = _uiState
 
-    init { loadQrs() }
+    init {
+        loadQrs()
+    }
 
     fun loadQrs() = viewModelScope.launch {
         _uiState.value = HomeUIState.Loading
-        try { _uiState.value = HomeUIState.Success(getAllQrs()) }
-        catch (e: Exception) { _uiState.value = HomeUIState.Error(e.message ?: "Unknown error") }
+        try {
+            val qrList = getAllQrsUseCase()
+            _uiState.value = HomeUIState.Success(qrList)
+        } catch (e: Exception) {
+            _uiState.value = HomeUIState.Error(e.message ?: "Unknown error")
+        }
     }
 
     fun deleteQr(qrId: String) = viewModelScope.launch {

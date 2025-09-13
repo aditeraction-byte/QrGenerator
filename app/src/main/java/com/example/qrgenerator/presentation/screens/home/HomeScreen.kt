@@ -69,7 +69,7 @@ fun HomeScreen(
     reloadTrigger: Boolean
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val softBlue = Color(0xFF5A9BFF) // azul más suave
+    val softBlue = Color(0xFF5A9BFF)
 
     LaunchedEffect(reloadTrigger) { viewModel.loadQrs() }
 
@@ -127,7 +127,7 @@ fun HomeScreen(
                             items(list) { qr ->
                                 val qrBitmap = remember(qr.id) {
                                     QrHelper.generateQrBitmap(
-                                        content = qr.redirectUrl,
+                                        content = qr.shortLink,
                                         fgColorHex = qr.fgColor,
                                         bgColorHex = qr.bgColor,
                                         size = 150

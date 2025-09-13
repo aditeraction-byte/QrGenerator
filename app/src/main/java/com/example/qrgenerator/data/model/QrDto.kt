@@ -6,6 +6,7 @@ data class QrDto(
     val title: String = "",
     val fgColor: String = "#000000",
     val bgColor: String = "#FFFFFF",
+    val ownerUid: String = "",
     val expiresAt: Long? = null,
     val createdAt: Long = 0L
 )
