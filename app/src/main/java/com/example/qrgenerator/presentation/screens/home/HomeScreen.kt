@@ -140,7 +140,7 @@ fun HomeScreen(
                                     qrBitmap = qrBitmap,
                                     onEdit = { onQrDetail(qr.id) },
                                     onStats = { onQrStats(qr.id) },
-                                    onDelete = { viewModel.deleteQr(qr.id) } // 👈 acá lo pasamos
+                                    onDelete = { viewModel.deleteQr(qr.id) }
                                 )
                             }
                         }
@@ -163,7 +163,7 @@ fun QrCard(
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    // Dialogo de confirmación al borrar
+
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
@@ -183,7 +183,7 @@ fun QrCard(
         )
     }
 
-    // Borde degradé
+
     val gradientBorder = Brush.horizontalGradient(
         colors = listOf(Color(0xFF5A9BFF), Color(0xFF6A11CB))
     )
@@ -208,7 +208,7 @@ fun QrCard(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // QR a la izquierda
+
                     Image(
                         bitmap = qrBitmap,
                         contentDescription = "QR code for $title",
@@ -219,11 +219,11 @@ fun QrCard(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Column con title, url y botones
+
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        // Título limitado a 25 caracteres
+
                         Text(
                             text = if (title.length > 25) title.take(25) + "…" else title,
                             style = MaterialTheme.typography.titleMedium.copy(
@@ -262,7 +262,6 @@ fun QrCard(
                     }
                 }
 
-                // Botón de borrar en esquina superior derecha
                 IconButton(
                     onClick = { showDeleteDialog = true },
                     modifier = Modifier.align(Alignment.TopEnd)

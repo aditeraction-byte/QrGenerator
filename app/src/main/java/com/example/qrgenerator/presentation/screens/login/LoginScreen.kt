@@ -32,8 +32,8 @@ fun LoginScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF7A4DCC), // violeta suave
-                        Color(0xFF5AA0FF)  // azul suave
+                        Color(0xFF7A4DCC),
+                        Color(0xFF5AA0FF)
                     )
                 )
             ),
