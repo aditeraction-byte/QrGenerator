@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.qrgenerator.domain.model.QrDomain
 import com.example.qrgenerator.domain.usecase.qrGenerator.CreateQrUseCase
 import com.example.qrgenerator.utils.helpers.QrHelper
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QrViewModel @Inject constructor(
-    private val createQrUseCase: CreateQrUseCase
+    private val createQrUseCase: CreateQrUseCase,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<QrUIState>(QrUIState.Idle)
@@ -26,6 +28,12 @@ class QrViewModel @Inject constructor(
 
     fun createQr(qrId: String, title: String, redirectUrl: String) {
         viewModelScope.launch {
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                _uiState.value = QrUIState.Error("User not logged in")
+                return@launch
+            }
+
             if (qrId.isBlank()) {
                 _uiState.value = QrUIState.Error("Shortlink cannot be empty")
                 return@launch
@@ -38,7 +46,8 @@ class QrViewModel @Inject constructor(
                     title = title,
                     redirectUrl = normalizeUrl(redirectUrl),
                     fgColor = "#000000",
-                    bgColor = "#FFFFFF"
+                    bgColor = "#FFFFFF",
+                    ownerUid = currentUser.uid
                 )
 
                 createQrUseCase(qr)

@@ -100,4 +100,7 @@ dependencies {
 
     // MOCKING
     testImplementation(libs.mockk)
+
+    implementation ("com.patrykandpatrick.vico:compose:1.14.0")
+    implementation ("com.patrykandpatrick.vico:core:1.14.0")
 }
