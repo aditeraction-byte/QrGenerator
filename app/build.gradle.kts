@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("plugin.compose") version "2.0.0"
+    kotlin("plugin.compose") version "2.1.0"
     alias(libs.plugins.hilt.android)
     kotlin("kapt")
     alias(libs.plugins.google.gms.google.services)
