@@ -1,22 +1,16 @@
 package com.example.qrgenerator.presentation.screens.generator
 
-import android.util.Log
+
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.qrgenerator.domain.model.QrDomain
 import com.example.qrgenerator.domain.usecase.qrGenerator.CreateQrUseCase
-import com.example.qrgenerator.domain.usecase.qrGenerator.GetQrByIdUseCase
-import com.example.qrgenerator.domain.usecase.qrGenerator.UpdateQrUseCase
 import com.example.qrgenerator.utils.helpers.QrHelper
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
