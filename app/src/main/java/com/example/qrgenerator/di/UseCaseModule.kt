@@ -71,7 +71,7 @@ object UseCaseModule {
     fun provideAddQrUseCase(repo: HomeRepository) =
         AddQrUseCase(repo)
 
-    // QrScan / Analytics Use Cases
+    // QrScan / Stats Use Cases
     @Provides
     fun provideGetQrScansUseCase(repository: QrScanRepository) =
         GetQrScansUseCase(repository)

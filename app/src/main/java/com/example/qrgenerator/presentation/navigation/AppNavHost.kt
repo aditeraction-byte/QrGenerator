@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.qrgenerator.presentation.screens.generator.QrScreen
@@ -36,7 +35,12 @@ fun AppNavHost() {
                 onCreateQr = { navController.navigate(Screen.QrGenerator.route) },
                 onQrDetail = { qrId -> navController.navigate(Screen.QrDetails.createRoute(qrId)) },
                 onQrStats = { qrId -> navController.navigate(Screen.QrStats.createRoute(qrId)) },
-                reloadTrigger = reloadTrigger
+                reloadTrigger = reloadTrigger,
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
             )
         }
 

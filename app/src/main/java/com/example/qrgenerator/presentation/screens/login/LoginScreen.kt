@@ -1,8 +1,10 @@
 package com.example.qrgenerator.presentation.screens.login
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -13,10 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.qrgenerator.presentation.components.AppButton
+import com.example.qrgenerator.presentation.components.AppCard
+import com.example.qrgenerator.presentation.components.AppText
+import com.example.qrgenerator.presentation.components.AppTextField
 
+@SuppressLint("ConfigurationScreenWidthHeight")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
@@ -31,99 +38,86 @@ fun LoginScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF7A4DCC),
-                        Color(0xFF5AA0FF)
-                    )
+                    colors = listOf(Color(0xFF7A4DCC), Color(0xFF5AA0FF))
                 )
             ),
         contentAlignment = Alignment.Center
     ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(24.dp)
+            AppCard(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = "Welcome",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color(0xFF5AA0FF) // azul suave
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Email
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Password
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth(),
-                    leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Login
-                Button(
-                    onClick = { viewModel.login(email, password) },
-                    enabled = uiState !is LoginUIState.Loading,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF5AA0FF), // azul suave
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Text("Login")
-                }
-                Spacer(modifier = Modifier.height(8.dp))
+                    AppText(
+                        text = "Welcome",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color(0xFF5AA0FF)
+                    )
 
-                // Register
-                Button(
-                    onClick = { viewModel.register(email, password) },
-                    enabled = uiState !is LoginUIState.Loading,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF7A4DCC), // violeta suave
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Register")
-                }
+                    Spacer(Modifier.height(16.dp))
 
-                // Error
-                if (uiState is LoginUIState.Error) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = (uiState as LoginUIState.Error).message,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center,
+                    AppTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = "Email",
+                        leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    AppTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = "Password",
+                        visualTransformation = PasswordVisualTransformation(),
+                        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    AppButton(
+                        onClick = { viewModel.login(email, password) },
+                        text = "Login",
+                        enabled = uiState !is LoginUIState.Loading,
+                        modifier = Modifier.fillMaxWidth(),
+                        containerColor = Color(0xFF5AA0FF)
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    AppButton(
+                        onClick = { viewModel.register(email, password) },
+                        text = "Register",
+                        enabled = uiState !is LoginUIState.Loading,
+                        modifier = Modifier.fillMaxWidth(),
+                        containerColor = Color(0xFF7A4DCC)
+                    )
+
+                    if (uiState is LoginUIState.Error) {
+                        Spacer(Modifier.height(12.dp))
+                        AppText(
+                            text = (uiState as LoginUIState.Error).message,
+                            color = Color.Red
+                        )
+                    }
                 }
             }
         }
 
-        // Overlay Loading
         if (uiState is LoginUIState.Loading) {
             Box(
                 modifier = Modifier
@@ -135,7 +129,6 @@ fun LoginScreen(
             }
         }
 
-        // Success
         if (uiState is LoginUIState.Success) {
             LaunchedEffect(Unit) { onLoginSuccess() }
         }

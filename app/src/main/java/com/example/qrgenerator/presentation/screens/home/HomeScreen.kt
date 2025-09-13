@@ -1,60 +1,37 @@
 package com.example.qrgenerator.presentation.screens.home
 
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import com.example.qrgenerator.presentation.components.AppScaffold
+import com.example.qrgenerator.presentation.components.AppText
+import com.example.qrgenerator.presentation.components.AppTopBar
+import com.example.qrgenerator.presentation.components.QrCard
 import com.example.qrgenerator.utils.helpers.QrHelper
 
 
@@ -66,32 +43,40 @@ fun HomeScreen(
     onCreateQr: () -> Unit,
     onQrDetail: (String) -> Unit,
     onQrStats: (String) -> Unit,
-    reloadTrigger: Boolean
+    reloadTrigger: Boolean,
+    onLogout: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val user by viewModel.user.collectAsState()
     val softBlue = Color(0xFF5A9BFF)
+    val displayName = user?.email?.substringBefore("@") ?: "Usuario"
 
     LaunchedEffect(reloadTrigger) { viewModel.loadQrs() }
 
-    Scaffold(
+    AppScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("My QR App") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = softBlue,
-                    titleContentColor = Color.White
-                )
+            AppTopBar(
+                title = "Welcome, $displayName",
+                showLogout = true,
+                onLogout = {
+                    viewModel.logout { onLogout() }
+                }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateQr,
-                containerColor = softBlue
+                containerColor = softBlue,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.size(56.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create QR")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "New QR",
+                    tint = Color.White
+                )
             }
-        },
-        containerColor = Color.White
+        }
     ) { padding ->
         Box(
             modifier = Modifier
@@ -104,7 +89,7 @@ fun HomeScreen(
                     color = softBlue
                 )
 
-                is HomeUIState.Error -> Text(
+                is HomeUIState.Error -> AppText(
                     text = (uiState as HomeUIState.Error).message,
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
@@ -113,7 +98,7 @@ fun HomeScreen(
                 is HomeUIState.Success -> {
                     val list = (uiState as HomeUIState.Success).qrList
                     if (list.isEmpty()) {
-                        Text(
+                        AppText(
                             text = "No QR codes found. Create one!",
                             modifier = Modifier.align(Alignment.Center),
                             color = Color.Gray
@@ -121,6 +106,7 @@ fun HomeScreen(
                     } else {
                         LazyColumn(
                             modifier = Modifier
+                                .fillMaxSize()
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
@@ -134,143 +120,21 @@ fun HomeScreen(
                                     ).asImageBitmap()
                                 }
 
+
                                 QrCard(
                                     title = qr.title.ifEmpty { "QR ${qr.id.take(6)}" },
                                     url = qr.redirectUrl,
                                     qrBitmap = qrBitmap,
                                     onEdit = { onQrDetail(qr.id) },
                                     onStats = { onQrStats(qr.id) },
-                                    onDelete = { viewModel.deleteQr(qr.id) }
+                                    onDelete = { viewModel.deleteQr(qr.id) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
                                 )
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun QrCard(
-    title: String,
-    url: String,
-    qrBitmap: ImageBitmap,
-    onEdit: () -> Unit,
-    onStats: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
-
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete QR") },
-            text = { Text("Are you sure you want to delete this QR code?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        onDelete()
-                    }
-                ) { Text("Delete") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
-            }
-        )
-    }
-
-
-    val gradientBorder = Brush.horizontalGradient(
-        colors = listOf(Color(0xFF5A9BFF), Color(0xFF6A11CB))
-    )
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(vertical = 8.dp)
-            .border(2.dp, gradientBorder, RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp))
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-        ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Image(
-                        bitmap = qrBitmap,
-                        contentDescription = "QR code for $title",
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-
-                        Text(
-                            text = if (title.length > 25) title.take(25) + "…" else title,
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF212121)
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Text(
-                            text = url,
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = Color(0xFF424242)
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            TextButton(onClick = onEdit) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color(0xFF5A9BFF))
-                                Spacer(Modifier.width(4.dp))
-                                Text("Editar", color = Color(0xFF5A9BFF))
-                            }
-                            TextButton(onClick = onStats) {
-                                Icon(Icons.Default.Star, contentDescription = "Analytics", tint = Color(0xFF6A11CB))
-                                Spacer(Modifier.width(4.dp))
-                                Text("Analytics", color = Color(0xFF6A11CB))
-                            }
-                        }
-                    }
-                }
-
-                IconButton(
-                    onClick = { showDeleteDialog = true },
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete QR",
-                        tint = Color(0xFFE53935)
-                    )
                 }
             }
         }

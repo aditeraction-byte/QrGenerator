@@ -1,35 +1,29 @@
 package com.example.qrgenerator.presentation.screens.qrStats
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -38,17 +32,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.qrgenerator.domain.model.QrScanDomain
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.qrgenerator.presentation.components.AppStatCard
+import com.example.qrgenerator.presentation.components.AppText
 import java.text.SimpleDateFormat
 import java.util.Date
 import kotlin.math.roundToInt
 
 
-@SuppressLint("ConfigurationScreenWidthHeight")
+@SuppressLint("ConfigurationScreenWidthHeight", "SimpleDateFormat")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QrStatsScreen(
@@ -57,31 +51,31 @@ fun QrStatsScreen(
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState(initial = QrStatsUIState.Loading)
-
     LaunchedEffect(qrId) { viewModel.loadScans(qrId) }
 
-
-
+    val violetSoft = Color(0xFF7A4DCC)
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("QR Statistics") },
+                title = { AppText("QR Statistics", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF7A4DCC))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = violetSoft)
             )
         },
         containerColor = Color(0xFFF5F5F5)
-    ) { padding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             when (uiState) {
@@ -89,118 +83,93 @@ fun QrStatsScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(250.dp),
+                            .height(screenWidth * 0.5f),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = Color(0xFF7A4DCC))
+                        CircularProgressIndicator(color = violetSoft)
                     }
                 }
                 is QrStatsUIState.Error -> {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(250.dp),
+                            .height(screenWidth * 0.5f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        AppText(
                             text = (uiState as QrStatsUIState.Error).message,
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodyLarge
+                            color = Color.Red
                         )
                     }
                 }
                 is QrStatsUIState.Success -> {
                     val scans = (uiState as QrStatsUIState.Success).scans
-                    StatsContentEnhanced(scans = scans)
+
+                    val stats = listOf(
+                        Triple("Total Scans", scans.size.toString(), Icons.Default.Star),
+                        Triple(
+                            "Last Scan",
+                            scans.maxByOrNull { it.timestamp }?.timestamp?.let {
+                                SimpleDateFormat("dd/MM/yyyy HH:mm").format(Date(it))
+                            } ?: "N/A",
+                            Icons.Default.DateRange
+                        ),
+                        Triple(
+                            "Top Country",
+                            scans.groupingBy { it.country ?: "Unknown" }.eachCount().maxByOrNull { it.value }?.key ?: "N/A",
+                            Icons.Default.Person
+                        ),
+                        Triple(
+                            "Top State",
+                            scans.groupingBy { it.state ?: "Unknown" }.eachCount().maxByOrNull { it.value }?.key ?: "N/A",
+                            Icons.Default.Place
+                        ),
+                        Triple(
+                            "Top City",
+                            scans.groupingBy { it.city ?: "Unknown" }.eachCount().maxByOrNull { it.value }?.key ?: "N/A",
+                            Icons.Default.LocationOn
+                        ),
+                        Triple(
+                            "Countries Count",
+                            scans.groupingBy { it.country ?: "Unknown" }.eachCount().keys.size.toString(),
+                            Icons.Default.Email
+                        ),
+                        Triple(
+                            "States Count",
+                            scans.groupingBy { it.state ?: "Unknown" }.eachCount().keys.size.toString(),
+                            Icons.Default.Place
+                        ),
+                        Triple(
+                            "Cities Count",
+                            scans.groupingBy { it.city ?: "Unknown" }.eachCount().keys.size.toString(),
+                            Icons.Default.LocationOn
+                        ),
+                        Triple(
+                            "Avg Scans/Day",
+                            (scans.groupingBy { SimpleDateFormat("dd/MM/yyyy").format(Date(it.timestamp)) }
+                                .eachCount().values.sum().toFloat() /
+                                    scans.groupingBy { SimpleDateFormat("dd/MM/yyyy").format(Date(it.timestamp)) }
+                                        .eachCount().size).roundToInt().toString(),
+                            Icons.Default.DateRange
+                        )
+                    )
+
+                    stats.forEach { (title, value, icon) ->
+                        AppStatCard(
+                            title = title,
+                            value = value,
+                            icon = icon,
+                            iconTint = violetSoft,
+                            textColor = violetSoft,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(screenWidth * 0.25f)
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-@SuppressLint("SimpleDateFormat")
-@Composable
-fun StatsContentEnhanced(scans: List<QrScanDomain>) {
-    if (scans.isEmpty()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("No scans available", style = MaterialTheme.typography.bodyLarge)
-        }
-        return
-    }
 
-    val totalScans = scans.size
-    val latestScan = scans.maxByOrNull { it.timestamp }
-    val scansByCountry = scans.groupingBy { it.country ?: "Unknown" }.eachCount()
-    val topCountry = scansByCountry.maxByOrNull { it.value }?.key ?: "N/A"
-    val uniqueCountries = scansByCountry.keys.size
-    val scansByDay = scans.groupingBy { SimpleDateFormat("dd/MM/yyyy").format(Date(it.timestamp)) }.eachCount()
-    val avgScansPerDay = (scansByDay.values.sum().toFloat() / scansByDay.size).roundToInt()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-
-        StatCardLarge(title = "Total Scans", value = totalScans.toString(), icon = Icons.Default.Star, modifier = Modifier.weight(1f))
-        StatCardLarge(
-            title = "Last Scan",
-            value = latestScan?.timestamp?.let { SimpleDateFormat("dd/MM/yyyy HH:mm").format(Date(it)) } ?: "N/A",
-            icon = Icons.Default.DateRange,
-            modifier = Modifier.weight(1f)
-        )
-        StatCardLarge(title = "Top Country", value = topCountry, icon = Icons.Default.LocationOn, modifier = Modifier.weight(1f))
-        StatCardLarge(title = "Countries Count", value = uniqueCountries.toString(), icon = Icons.Default.Person, modifier = Modifier.weight(1f))
-        StatCardLarge(title = "Avg Scans/Day", value = avgScansPerDay.toString(), icon = Icons.Default.DateRange, modifier = Modifier.weight(1f))
-    }
-}
-
-@Composable
-fun StatCardLarge(title: String, value: String, icon: ImageVector? = null, @SuppressLint("ModifierParameter") modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = Color(0xFF7A4DCC),
-                    modifier = Modifier.size(32.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF7A4DCC)
-                )
-            }
-        }
-    }
-}
