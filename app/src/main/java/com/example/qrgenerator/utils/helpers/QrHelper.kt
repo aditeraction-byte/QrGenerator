@@ -10,7 +10,12 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.toColorInt
 
 object QrHelper {
-    fun generateQrBitmap(content: String, fgColorHex: String = "#000000", bgColorHex: String = "#FFFFFF", size: Int = 512): Bitmap {
+    fun generateQrBitmap(
+        content: String,
+        fgColorHex: String = "#000000",
+        bgColorHex: String = "#FFFFFF",
+        size: Int = 512
+    ): Bitmap {
         val bitMatrix: BitMatrix = MultiFormatWriter().encode(
             content,
             BarcodeFormat.QR_CODE,
@@ -28,3 +33,4 @@ object QrHelper {
         return bitmap
     }
 }
+
