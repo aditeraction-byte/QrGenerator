@@ -1,21 +1,12 @@
 package com.example.qrgenerator.presentation.screens.qrStats
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.qrgenerator.domain.model.QrScanDomain
-import com.example.qrgenerator.domain.usecase.qrGenerator.GetQrByIdUseCase
 import com.example.qrgenerator.domain.usecase.stadistic.GetQrScansUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel

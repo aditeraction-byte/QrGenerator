@@ -1,6 +1,5 @@
 package com.example.qrgenerator.presentation.screens.qrStats
 
-import com.example.qrgenerator.domain.model.QrDomain
 import com.example.qrgenerator.domain.model.QrScanDomain
 
 sealed class QrStatsUIState {
