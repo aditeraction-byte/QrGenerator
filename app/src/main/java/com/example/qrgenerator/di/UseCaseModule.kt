@@ -1,21 +1,82 @@
 package com.example.qrgenerator.di
 
-import com.example.qrgenerator.domain.repository.QrRepository
-import com.example.qrgenerator.domain.usecase.GetQrByIdUseCase
-import com.example.qrgenerator.domain.usecase.UpdateRedirectUrlUseCase
+import com.example.qrgenerator.domain.repository.AuthRepository
+import com.example.qrgenerator.domain.repository.HomeRepository
+import com.example.qrgenerator.domain.repository.QrGeneratorRepository
+import com.example.qrgenerator.domain.repository.QrScanRepository
+import com.example.qrgenerator.domain.repository.UserRepository
+import com.example.qrgenerator.domain.usecase.auth.GetCurrentUserUseCase
+import com.example.qrgenerator.domain.usecase.auth.LoginUseCase
+import com.example.qrgenerator.domain.usecase.auth.LogoutUseCase
+import com.example.qrgenerator.domain.usecase.auth.RegisterAndCreateUserUseCase
+import com.example.qrgenerator.domain.usecase.home.AddQrUseCase
+import com.example.qrgenerator.domain.usecase.home.GetAllQrsUseCase
+import com.example.qrgenerator.domain.usecase.qrGenerator.CreateQrUseCase
+import com.example.qrgenerator.domain.usecase.qrGenerator.GetAllGeneratorQrsUseCase
+import com.example.qrgenerator.domain.usecase.qrGenerator.GetQrByIdUseCase
+import com.example.qrgenerator.domain.usecase.qrGenerator.UpdateQrUseCase
+import com.example.qrgenerator.domain.usecase.stadistic.GetQrScansUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
-
+/**
+ * Module that provides Use Case instances.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {
 
+    // QrGenerator Use Cases
     @Provides
-    fun provideGetQrByIdUseCase(repository: QrRepository) = GetQrByIdUseCase(repository)
+    fun provideGetQrByIdUseCase(repository: QrGeneratorRepository) =
+        GetQrByIdUseCase(repository)
 
     @Provides
-    fun provideUpdateRedirectUrlUseCase(repository: QrRepository) = UpdateRedirectUrlUseCase(repository)
+    fun provideCreateQrUseCase(repository: QrGeneratorRepository) =
+        CreateQrUseCase(repository)
+
+    @Provides
+    fun provideUpdateQrUseCase(repository: QrGeneratorRepository) =
+        UpdateQrUseCase(repository)
+
+    @Provides
+    fun provideGetAllGeneratorQrsUseCase(repository: QrGeneratorRepository) =
+        GetAllGeneratorQrsUseCase(repository)
+
+    // Auth Use Cases
+    @Provides
+    fun provideLoginUseCase(repository: AuthRepository) =
+        LoginUseCase(repository)
+
+    @Provides
+    fun provideRegisterAndCreateUserUseCase(
+        authRepository: AuthRepository,
+        userRepository: UserRepository
+    ) = RegisterAndCreateUserUseCase(authRepository, userRepository)
+
+    @Provides
+    fun provideLogoutUseCase(repository: AuthRepository) =
+        LogoutUseCase(repository)
+
+    @Provides
+    fun provideGetCurrentUserUseCase(repository: AuthRepository) =
+        GetCurrentUserUseCase(repository)
+
+    // Home Use Cases
+    @Provides
+    fun provideGetAllQrsUseCase(repo: HomeRepository) =
+        GetAllQrsUseCase(repo)
+
+    @Provides
+    fun provideAddQrUseCase(repo: HomeRepository) =
+        AddQrUseCase(repo)
+
+    // QrScan / Stats Use Cases
+    @Provides
+    fun provideGetQrScansUseCase(repository: QrScanRepository) =
+        GetQrScansUseCase(repository)
+
+
 }

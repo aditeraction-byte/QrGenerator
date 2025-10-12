@@ -1,65 +1,78 @@
 package com.example.qrgenerator.presentation.screens.generator
 
-import androidx.compose.ui.graphics.ImageBitmap
+
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.qrgenerator.domain.usecase.GetQrByIdUseCase
-import com.example.qrgenerator.domain.usecase.UpdateRedirectUrlUseCase
+import com.example.qrgenerator.domain.model.QrDomain
+import com.example.qrgenerator.domain.usecase.qrGenerator.CreateQrUseCase
 import com.example.qrgenerator.utils.helpers.QrHelper
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for handling QR creation and state management.
+ */
 @HiltViewModel
 class QrViewModel @Inject constructor(
-    private val getQrByIdUseCase: GetQrByIdUseCase,
-    private val updateRedirectUrlUseCase: UpdateRedirectUrlUseCase
+    private val createQrUseCase: CreateQrUseCase,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<QrUIState>(QrUIState.Loading)
+    private val _uiState = MutableStateFlow<QrUIState>(QrUIState.Idle)
     val uiState: StateFlow<QrUIState> = _uiState
 
-    private val qrShortlink = "https://mavrial.github.io/Qr-Redirect/"
-    private var qrBitmap: ImageBitmap? = null
-    private val qrId = "default_qr"
+    /**
+     * Ensures the URL starts with http/https.
+     */
+    fun normalizeUrl(url: String): String =
+        if (url.startsWith("http://") || url.startsWith("https://")) url else "https://$url"
 
-    init {
-        loadInitialQr()
-    }
-
-    private fun loadInitialQr() {
+    /**
+     * Creates a QR code using the provided parameters.
+     * Updates the UI state accordingly.
+     */
+    fun createQr(qrId: String, title: String, redirectUrl: String) {
         viewModelScope.launch {
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                _uiState.value = QrUIState.Error("User not logged in")
+                return@launch
+            }
+
+            if (qrId.isBlank()) {
+                _uiState.value = QrUIState.Error("Shortlink cannot be empty")
+                return@launch
+            }
+
             _uiState.value = QrUIState.Loading
             try {
-                val qrDomain = getQrByIdUseCase(qrId)
-                qrBitmap = qrBitmap ?: QrHelper.generateQrBitmap(qrShortlink).asImageBitmap()
-                _uiState.value = QrUIState.Success(qrDomain, qrBitmap!!)
-            } catch (e: Exception) {
-                _uiState.value = QrUIState.Error(e.message ?: "Unknown error")
-            }
-        }
-    }
+                val qr = QrDomain(
+                    id = qrId,
+                    title = title,
+                    redirectUrl = normalizeUrl(redirectUrl),
+                    fgColor = "#000000",
+                    bgColor = "#FFFFFF",
+                    ownerUid = currentUser.uid
+                )
 
-    fun updateRedirectUrl(newUrl: String) {
-        viewModelScope.launch {
-            try {
+                createQrUseCase(qr)
 
-                val normalizedUrl = if (newUrl.startsWith("http://") || newUrl.startsWith("https://")) {
-                    newUrl
-                } else {
-                    "https://$newUrl"
-                }
+                val bitmap = QrHelper.generateQrBitmap(
+                    content = qr.shortLink,
+                    fgColorHex = qr.fgColor,
+                    bgColorHex = qr.bgColor
+                ).asImageBitmap()
 
-                val updatedQr = updateRedirectUrlUseCase(qrId, normalizedUrl)
-                _uiState.value = qrBitmap?.let { bitmap ->
-                    QrUIState.Success(updatedQr, bitmap)
-                } ?: QrUIState.Error("QR image not available")
+                _uiState.value = QrUIState.Success(qr, bitmap)
             } catch (e: Exception) {
                 _uiState.value = QrUIState.Error(e.message ?: "Unknown error")
             }
         }
     }
 }
+

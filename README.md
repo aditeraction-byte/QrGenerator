@@ -1,47 +1,72 @@
 # QR-Generator
 
-### Android App to Generate QR Codes Dynamically
-
-#### Screenshots
-
-<img src="https://github.com/user-attachments/assets/2b3725c6-1e4f-43cf-8a89-0fe8ee9f2471" width="150" height="300" />
-<img src="https://github.com/user-attachments/assets/1a6a78d0-7b39-4274-aacb-307dc7da4608" width="150" height="300" />
-<img src="https://github.com/user-attachments/assets/0f67a2e6-fd65-42a6-a5e7-84bf984da68c" width="150" height="300" />
-<img src="https://github.com/user-attachments/assets/bdf5b01a-f7ea-477f-9ace-5ffd3bd93f81" width="150" height="300" />
-
-#### Shortlink & Redirect
-
-<img src="https://github.com/user-attachments/assets/106e7a16-e6a7-49f5-af74-f5d3c3a88829" width="150" height="250" />
-<img src="https://github.com/user-attachments/assets/c8358dc3-4a3a-4db2-9ef0-dd31329566b4" width="150" height="250" />
-<img src="https://github.com/user-attachments/assets/0bc6c1b3-2354-4089-b996-71eae590be29" width="150" height="250" />
-<img src="https://github.com/user-attachments/assets/a23699ec-0122-4755-a0c2-2c797007a545" width="150" height="250" />
+Android app to generate QR codes dynamically and manage shortlinks.
 
 ---
 
-## How to Use the App
+## Features
 
-1. **Open the app** on your Android device or emulator.  
-2. **Enter the URL** you want the QR code to redirect to in the TextField.  
-3. **Generate the QR code** by tapping the "Generate" button.  
-4. The QR code will always point to the same shortlink. Updating the URL dynamically changes the redirection destination.  
-5. **Scan the QR code** with any QR scanner to test it.
+- Generate dynamic QR codes pointing to shortlinks.
+- Update the URL dynamically without changing the QR code.
+- Scan the QR code with any QR scanner to test redirection.
+- Responsive UI for all screens (Home, QR Generator, QR Stats, QR Details, Login).
+- Reusable UI components (`AppButton`, `AppCard`, `AppTextField`) for consistent design.
+- MVVM architecture with Compose UI and clean code principles.
+- Firebase Firestore support for shortlink storage and dynamic URL updates.
+- Login and registration flow with form validation.
 
 ---
 
-## Tools & Technologies Used
+## Screens
 
-- **Language:** Kotlin – modern, type-safe language for Android development.  
-- **IDE:** Android Studio – official IDE for Android development with full Gradle support.  
-- **Libraries & SDKs:**  
-  - **ZXing:** used for generating QR codes dynamically.  
-  - **Firebase Firestore / Realtime Database:** for storing shortlink mappings and dynamic URL updates (if implemented).  
-  - **GitHub Pages:** used to host shortlinks and handle redirection for QR codes.  
-  - **Android Jetpack Components:** LiveData, ViewModel for managing UI state and data flow.  
-  - **Dagger / Hilt (Dependency Injection):** for modular and testable architecture.  
-- **Platform:** Android SDK – supports a wide range of devices and versions.  
-- **Version Control:** Git & GitHub – for code management, versioning, and collaboration.  
-- **Other Tools / Practices:**  
-  - **Gradle:** for dependency management and build automation.  
-  - **MVVM Architecture:** separates UI from business logic.  
-  - **Clean Code Principles:** meaningful variable names, modularization, and readability. 
+Below are screenshots of the main screens of the app (scaled for readability):
+
+### Home Screen
+<img src="https://github.com/user-attachments/assets/55a8fb3c-2f77-477b-b0fc-6f91f7db63d8" width="200"/>
+
+### QR Generator Screen
+<img src="https://github.com/user-attachments/assets/dcc7cf7f-3000-458b-a780-c81ee43b1c97" width="200"/>
+
+### QR Details / Edit Screen
+<img src="https://github.com/user-attachments/assets/eb82da20-b3b9-4da7-8f28-826d6733015f" width="200"/>
+
+### QR Stats Screen
+<img src="https://github.com/user-attachments/assets/cd3f2379-4d50-4559-bb92-58a7f0018c12" width="200"/>
+
+### Login Screen
+<img src="https://github.com/user-attachments/assets/6154fe7e-76c0-472d-ac7f-d136a7fde55d" width="200"/>
+
+### Redirection
+<img src="https://github.com/user-attachments/assets/effd6ef4-b14f-49ad-a02c-54ac21fdc4c2" width="200"/>
+
+## How to Use
+
+1. Open the app on your Android device or emulator.
+2. Enter the URL you want the QR code to redirect to in the TextField.
+3. Generate the QR code by tapping the "Generate" button.
+4. Scan the QR code with any QR scanner to test it.
+5. Update the URL dynamically, and the shortlink will redirect to the new destination.
+6. Use the QR Stats and QR Details screens to view scan statistics and edit QR info.
+7. Login/Register to save your QR codes and track them in Firebase.
+
+---
+
+## Tools & Technologies
+
+- **Language:** Kotlin  
+- **IDE:** Android Studio  
+- **UI:** Jetpack Compose, Material3  
+- **Dependency Injection:** Hilt  
+- **Libraries:** ZXing (QR generation), Firebase Firestore  
+- **Architecture:** MVVM, LiveData/ViewModel  
+- **Version Control:** Git & GitHub  
+
+---
+
+## Notes
+
+- All screens are **responsive for mobile devices**, with scroll added for small screens.
+- UI components are **reusable** for consistency across the app.
+- QR codes are generated dynamically and can redirect to different URLs via shortlinks.
+- Follow Clean Code principles for easy maintenance and scalability.
 
