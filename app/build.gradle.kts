@@ -1,3 +1,7 @@
+import org.gradle.kotlin.dsl.androidTestImplementation
+import org.gradle.kotlin.dsl.kaptAndroidTest
+import org.gradle.kotlin.dsl.testImplementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -74,6 +78,8 @@ dependencies {
 
     // HILT / DI
     implementation(libs.hilt.android)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.hilt.navigation.compose)
 
@@ -100,7 +106,12 @@ dependencies {
 
     // MOCKING
     testImplementation(libs.mockk)
-
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation ("io.mockk:mockk-android:1.13.8")
+    androidTestImplementation ("com.google.dagger:hilt-android-testing:2.48") // versión Hilt que uses
+    kaptAndroidTest ("com.google.dagger:hilt-compiler:2.48")
+    androidTestImplementation ("androidx.arch.core:core-testing:2.2.0")
     implementation ("com.patrykandpatrick.vico:compose:1.14.0")
     implementation ("com.patrykandpatrick.vico:core:1.14.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }

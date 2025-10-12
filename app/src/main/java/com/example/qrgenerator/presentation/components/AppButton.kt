@@ -11,7 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-
+/**
+ * A customizable button that fills the width of its container.
+ *
+ * @param onClick Lambda executed when the button is clicked.
+ * @param text Text to display inside the button.
+ * @param modifier Modifier for styling and layout.
+ * @param containerColor Background color of the button.
+ * @param contentColor Color of the text/content.
+ * @param shape Shape of the button corners.
+ * @param enabled Whether the button is enabled or disabled.
+ */
 @Composable
 fun AppButton(
     onClick: () -> Unit,

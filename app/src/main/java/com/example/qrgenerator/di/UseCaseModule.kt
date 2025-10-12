@@ -21,7 +21,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
-
+/**
+ * Module that provides Use Case instances.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {

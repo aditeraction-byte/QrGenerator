@@ -13,7 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-
+/**
+ * Card to display a stat with title, value, and optional icon.
+ *
+ * @param title Title of the stat.
+ * @param value Value to display.
+ * @param icon Optional icon.
+ * @param iconTint Tint color for the icon.
+ * @param textColor Color of the value text.
+ * @param modifier Modifier for styling and layout.
+ */
 @Composable
 fun AppStatCard(
     title: String,

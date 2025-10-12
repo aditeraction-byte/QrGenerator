@@ -22,6 +22,13 @@ import com.example.qrgenerator.presentation.components.AppCard
 import com.example.qrgenerator.presentation.components.AppText
 import com.example.qrgenerator.presentation.components.AppTextField
 
+/**
+ * Composable for the Login screen.
+ * Displays email/password input, login/register buttons, and handles loading/error states.
+ *
+ * @param viewModel ViewModel handling login/registration logic.
+ * @param onLoginSuccess Callback triggered when login or registration succeeds.
+ */
 @SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,10 +36,14 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginSuccess: () -> Unit
 ) {
+    // Local state for text fields
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // Collect current UI state from ViewModel
     val uiState by viewModel.uiState.collectAsState()
 
+    // Background gradient and main container
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -50,6 +61,7 @@ fun LoginScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Card container for input fields and buttons
             AppCard(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
@@ -60,6 +72,7 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    // Welcome title
                     AppText(
                         text = "Welcome",
                         style = MaterialTheme.typography.headlineSmall,
@@ -68,6 +81,7 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
+                    // Email input
                     AppTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -78,6 +92,7 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(8.dp))
 
+                    // Password input
                     AppTextField(
                         value = password,
                         onValueChange = { password = it },
@@ -89,6 +104,7 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
+                    // Login button
                     AppButton(
                         onClick = { viewModel.login(email, password) },
                         text = "Login",
@@ -99,6 +115,7 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(8.dp))
 
+                    // Register button
                     AppButton(
                         onClick = { viewModel.register(email, password) },
                         text = "Register",
@@ -107,6 +124,7 @@ fun LoginScreen(
                         containerColor = Color(0xFF7A4DCC)
                     )
 
+                    // Error message display
                     if (uiState is LoginUIState.Error) {
                         Spacer(Modifier.height(12.dp))
                         AppText(
@@ -118,6 +136,7 @@ fun LoginScreen(
             }
         }
 
+        // Overlay for loading state
         if (uiState is LoginUIState.Loading) {
             Box(
                 modifier = Modifier
@@ -129,6 +148,7 @@ fun LoginScreen(
             }
         }
 
+        // Trigger callback when login/register succeeds
         if (uiState is LoginUIState.Success) {
             LaunchedEffect(Unit) { onLoginSuccess() }
         }

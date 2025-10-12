@@ -15,7 +15,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-
+/**
+ * Card with optional gradient border and background.
+ *
+ * @param modifier Modifier for styling and layout.
+ * @param gradientBorder Optional gradient for the card border.
+ * @param useGradientBackground If true, applies the gradient as background.
+ * @param cornerRadius Corner radius of the card.
+ * @param elevation Elevation of the card shadow.
+ * @param content Composable content inside the card.
+ */
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,

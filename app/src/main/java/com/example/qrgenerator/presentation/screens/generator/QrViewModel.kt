@@ -14,6 +14,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for handling QR creation and state management.
+ */
 @HiltViewModel
 class QrViewModel @Inject constructor(
     private val createQrUseCase: CreateQrUseCase,
@@ -23,9 +26,16 @@ class QrViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<QrUIState>(QrUIState.Idle)
     val uiState: StateFlow<QrUIState> = _uiState
 
+    /**
+     * Ensures the URL starts with http/https.
+     */
     fun normalizeUrl(url: String): String =
         if (url.startsWith("http://") || url.startsWith("https://")) url else "https://$url"
 
+    /**
+     * Creates a QR code using the provided parameters.
+     * Updates the UI state accordingly.
+     */
     fun createQr(qrId: String, title: String, redirectUrl: String) {
         viewModelScope.launch {
             val currentUser = auth.currentUser

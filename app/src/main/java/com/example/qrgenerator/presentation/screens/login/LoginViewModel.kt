@@ -13,6 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for Login screen.
+ * Handles login, registration, logout, and current user retrieval.
+ */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
@@ -24,6 +28,7 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<LoginUIState>(LoginUIState.Idle)
     val uiState: StateFlow<LoginUIState> = _uiState
 
+    // Common handler for asynchronous user operations
     private fun handleResult(result: suspend () -> UserDomain?) = viewModelScope.launch {
         _uiState.value = LoginUIState.Loading
         try {
@@ -34,6 +39,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    /** Logs in a user with email and password. Updates [uiState]. */
     fun login(email: String, password: String) {
         val cleanEmail = email.trim()
         val cleanPassword = password.trim()
@@ -48,6 +54,7 @@ class LoginViewModel @Inject constructor(
         handleResult { loginUseCase(cleanEmail, cleanPassword) }
     }
 
+    /** Registers a new user and updates [uiState] accordingly. */
     fun register(email: String, password: String) {
         val cleanEmail = email.trim()
         val cleanPassword = password.trim()
@@ -67,16 +74,13 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = LoginUIState.Loading
             registerAndCreateUserUseCase(cleanEmail, cleanPassword).fold(
-                onSuccess = { user ->
-                    _uiState.value = LoginUIState.Success(user)
-                },
-                onFailure = { e ->
-                    _uiState.value = LoginUIState.Error(e.message ?: "Registration failed")
-                }
+                onSuccess = { user -> _uiState.value = LoginUIState.Success(user) },
+                onFailure = { e -> _uiState.value = LoginUIState.Error(e.message ?: "Registration failed") }
             )
         }
     }
 
+    /** Logs out the current user. */
     fun logout() = viewModelScope.launch {
         try {
             logoutUseCase()
@@ -86,5 +90,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    /** Retrieves the current user and updates [uiState]. */
     fun getCurrentUser() = handleResult { getCurrentUserUseCase() }
 }

@@ -8,11 +8,17 @@ import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
+/**
+ * Implementation of AuthRepository using FirebaseAuth.
+ * Handles login, registration, logout, and retrieving current user.
+ */
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : AuthRepository {
-
+    /**
+     * Logs in a user with email and password.
+     * Returns UserDomain if successful, or a failure result.
+     */
     override suspend fun login(email: String, password: String): Result<UserDomain> =
         suspendCoroutine { continuation ->
             auth.signInWithEmailAndPassword(email,password)
@@ -27,7 +33,9 @@ class AuthRepositoryImpl @Inject constructor(
                 }
                 .addOnFailureListener { continuation.resume(Result.failure(it)) }
         }
-
+    /**
+     * Registers a new user with email and password.
+     */
     override suspend fun register(email: String, password: String): Result<UserDomain> =
         suspendCoroutine { continuation ->
             auth.createUserWithEmailAndPassword(email, password)
@@ -42,14 +50,18 @@ class AuthRepositoryImpl @Inject constructor(
                 }
                 .addOnFailureListener { continuation.resume(Result.failure(it)) }
         }
-
+    /**
+     * Logs out the currently authenticated user.
+     */
     override suspend fun logout(): Result<Unit> = try {
         auth.signOut()
         Result.success(Unit)
     }catch (e: Exception){
         Result.failure(e)
     }
-
+    /**
+     * Returns the currently logged-in user, or null if no user is authenticated.
+     */
     override suspend fun getCurrentUser(): UserDomain? {
         val firebaseUser = auth.currentUser
         return firebaseUser?.let { UserDto(it.uid, it.email ?: "").toDomain() }

@@ -12,15 +12,24 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
+/**
+ * ViewModel for QR Details screen.
+ * Handles loading a QR by ID and updating it.
+ */
 @HiltViewModel
 class QrDetailsViewModel @Inject constructor(
     private val getQrByIdUseCase: GetQrByIdUseCase,
     private val updateQrUseCase: UpdateQrUseCase
 ) : ViewModel() {
 
+    // Backing StateFlow to emit UI states
     private val _uiState = MutableStateFlow<QrDetailsUIState>(QrDetailsUIState.Loading)
     val uiState: StateFlow<QrDetailsUIState> = _uiState
 
+    /**
+     * Loads a QR by its ID.
+     * Updates UI state to Loading -> Success/Error.
+     */
     fun loadQr(qrId: String) = viewModelScope.launch {
         _uiState.value = QrDetailsUIState.Loading
         try {
@@ -31,6 +40,10 @@ class QrDetailsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates the QR data.
+     * Shows Loading while updating and then Success/Error.
+     */
     fun updateQr(qr: QrDomain) = viewModelScope.launch {
         _uiState.value = QrDetailsUIState.Loading
         try {
