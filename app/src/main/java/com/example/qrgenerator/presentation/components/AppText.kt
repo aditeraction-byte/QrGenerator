@@ -8,7 +8,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-
+/**
+ * Text composable with configurable style, color, overflow, and max lines.
+ *
+ * @param text Text content.
+ * @param style Text style.
+ * @param color Text color.
+ * @param maxLines Maximum lines to display.
+ * @param overflow How to handle overflow.
+ * @param modifier Modifier for styling and layout.
+ */
 @Composable
 fun AppText(
     text: String,

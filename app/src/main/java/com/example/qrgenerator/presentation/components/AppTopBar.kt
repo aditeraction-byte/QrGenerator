@@ -6,7 +6,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-
+/**
+ * Top app bar with optional logout button.
+ *
+ * @param title Title to display.
+ * @param showLogout Whether to show logout action.
+ * @param onLogout Lambda executed on logout click.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(

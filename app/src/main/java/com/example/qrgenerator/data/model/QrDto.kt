@@ -1,5 +1,8 @@
 package com.example.qrgenerator.data.model
-
+/**
+ * Data Transfer Object representing a QR code in Firestore.
+ * Contains metadata like colors, owner, expiration, and creation timestamp.
+ */
 data class QrDto(
     val id: String = "",
     val redirectUrl: String = "",

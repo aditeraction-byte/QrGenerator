@@ -18,10 +18,16 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Module that provides repository implementations.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
+    /**
+     * Provides a singleton QrGeneratorRepository implementation.
+     */
     @Provides
     @Singleton
     fun provideQrGeneratorRepo(
@@ -29,6 +35,9 @@ object RepositoryModule {
         auth: FirebaseAuth
     ): QrGeneratorRepository = QrGeneratorRepositoryImpl(firestore, auth)
 
+    /**
+     * Provides a singleton HomeRepository implementation.
+     */
     @Provides
     @Singleton
     fun provideHomeRepo(
@@ -36,16 +45,25 @@ object RepositoryModule {
         auth: FirebaseAuth
     ): HomeRepository = HomeRepositoryImpl(firestore, auth)
 
+    /**
+     * Provides a singleton AuthRepository implementation.
+     */
     @Provides
     @Singleton
     fun provideAuthRepo(auth: FirebaseAuth): AuthRepository =
         AuthRepositoryImpl(auth)
 
+    /**
+     * Provides a singleton UserRepository implementation.
+     */
     @Provides
     @Singleton
     fun provideUserRepo(firestore: FirebaseFirestore): UserRepository =
         UserRepositoryImpl(firestore)
 
+    /**
+     * Provides a singleton QrScanRepository implementation.
+     */
     @Provides
     @Singleton
     fun provideQrScanRepo(

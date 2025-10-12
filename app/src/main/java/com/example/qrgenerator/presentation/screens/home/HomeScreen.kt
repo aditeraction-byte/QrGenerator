@@ -36,6 +36,19 @@ import com.example.qrgenerator.utils.helpers.QrHelper
 
 
 
+/**
+ * Composable responsible for displaying the Home screen of the app.
+ *
+ * Shows a welcome message, QR code list, loading/error states, and
+ * a floating action button for creating new QR codes.
+ *
+ * @param viewModel [HomeViewModel] used to fetch user info and QR list.
+ * @param onCreateQr Callback invoked when the user taps the "New QR" FAB.
+ * @param onQrDetail Callback invoked when the user wants to view/edit a specific QR.
+ * @param onQrStats Callback invoked when the user wants to view statistics for a QR.
+ * @param reloadTrigger Boolean used to trigger reloading the QR list when changed.
+ * @param onLogout Callback invoked after the user logs out.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -51,6 +64,7 @@ fun HomeScreen(
     val softBlue = Color(0xFF5A9BFF)
     val displayName = user?.email?.substringBefore("@") ?: "Usuario"
 
+    // Reload QR list whenever reloadTrigger changes
     LaunchedEffect(reloadTrigger) { viewModel.loadQrs() }
 
     AppScaffold(
@@ -58,9 +72,7 @@ fun HomeScreen(
             AppTopBar(
                 title = "Welcome, $displayName",
                 showLogout = true,
-                onLogout = {
-                    viewModel.logout { onLogout() }
-                }
+                onLogout = { viewModel.logout { onLogout() } }
             )
         },
         floatingActionButton = {
@@ -111,6 +123,7 @@ fun HomeScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(list) { qr ->
+                                // Generate QR bitmap for display
                                 val qrBitmap = remember(qr.id) {
                                     QrHelper.generateQrBitmap(
                                         content = qr.shortLink,
@@ -120,7 +133,7 @@ fun HomeScreen(
                                     ).asImageBitmap()
                                 }
 
-
+                                // Display each QR in a card with actions
                                 QrCard(
                                     title = qr.title.ifEmpty { "QR ${qr.id.take(6)}" },
                                     url = qr.redirectUrl,

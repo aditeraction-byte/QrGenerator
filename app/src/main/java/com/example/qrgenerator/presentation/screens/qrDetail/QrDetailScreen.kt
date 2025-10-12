@@ -41,6 +41,14 @@ import com.example.qrgenerator.presentation.components.AppButton
 import com.example.qrgenerator.presentation.components.AppText
 import com.example.qrgenerator.utils.helpers.QrHelper
 
+/**
+ * Composable for displaying and editing a specific QR code.
+ * Shows a QR preview, editable title and redirect URL, and handles loading/error states.
+ *
+ * @param qrId The ID of the QR to display.
+ * @param viewModel ViewModel handling QR loading and updates.
+ * @param onBack Callback triggered when the user navigates back.
+ */
 @SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +57,16 @@ fun QrDetailsScreen(
     viewModel: QrDetailsViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
+    // Collect UI state from ViewModel
     val uiState by viewModel.uiState.collectAsState()
+
+    // Snackbar host for showing messages
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Screen width to scale the QR preview
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
+    // Load the QR data when qrId changes
     LaunchedEffect(qrId) { viewModel.loadQr(qrId) }
 
     Scaffold(
@@ -67,19 +81,22 @@ fun QrDetailsScreen(
             contentAlignment = Alignment.Center
         ) {
             when (uiState) {
+                // Show loading indicator
                 is QrDetailsUIState.Loading -> CircularProgressIndicator(color = Color(0xFF5AA0FF))
 
+                // Show error message
                 is QrDetailsUIState.Error -> AppText(
                     text = (uiState as QrDetailsUIState.Error).message,
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
 
+                // Show QR details
                 is QrDetailsUIState.Success -> {
                     val qr = (uiState as QrDetailsUIState.Success).qr
-
                     val qrSize = screenWidth * 0.5f
 
+                    // Generate QR bitmap for preview
                     val qrBitmap = remember(qr.id) {
                         QrHelper.generateQrBitmap(
                             content = qr.shortLink,
@@ -89,6 +106,7 @@ fun QrDetailsScreen(
                         ).asImageBitmap()
                     }
 
+                    // Editable fields
                     var title by remember { mutableStateOf(qr.title) }
                     var redirectUrl by remember { mutableStateOf(qr.redirectUrl) }
 
@@ -111,6 +129,7 @@ fun QrDetailsScreen(
                                 modifier = Modifier.padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+                                // QR preview
                                 Image(
                                     bitmap = qrBitmap,
                                     contentDescription = "QR Preview",
@@ -118,6 +137,7 @@ fun QrDetailsScreen(
                                 )
                                 Spacer(Modifier.height(16.dp))
 
+                                // Title input
                                 OutlinedTextField(
                                     value = title,
                                     onValueChange = { title = it },
@@ -125,6 +145,8 @@ fun QrDetailsScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Spacer(Modifier.height(8.dp))
+
+                                // Redirect URL input
                                 OutlinedTextField(
                                     value = redirectUrl,
                                     onValueChange = { redirectUrl = it },
@@ -133,6 +155,8 @@ fun QrDetailsScreen(
                                 )
 
                                 Spacer(Modifier.height(16.dp))
+
+                                // Save button
                                 AppButton(
                                     onClick = { viewModel.updateQr(qr.copy(title = title, redirectUrl = redirectUrl)) },
                                     text = "Save Changes",
@@ -140,6 +164,8 @@ fun QrDetailsScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Spacer(Modifier.height(12.dp))
+
+                                // Back button
                                 AppButton(
                                     onClick = onBack,
                                     text = "Back",

@@ -5,7 +5,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.VisualTransformation
-
+/**
+ * Outlined text field with optional leading icon and visual transformation.
+ *
+ * @param value Current text value.
+ * @param onValueChange Lambda to handle text changes.
+ * @param label Label text.
+ * @param modifier Modifier for styling and layout.
+ * @param singleLine Whether the field is single line.
+ * @param leadingIcon Optional composable icon at the start.
+ * @param visualTransformation Visual transformation for password or masked input.
+ */
 @Composable
 fun AppTextField(
     value: String,

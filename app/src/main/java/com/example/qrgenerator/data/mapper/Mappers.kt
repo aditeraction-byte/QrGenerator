@@ -7,7 +7,9 @@ import com.example.qrgenerator.domain.model.QrDomain
 import com.example.qrgenerator.domain.model.QrScanDomain
 import com.example.qrgenerator.domain.model.UserDomain
 
-
+/**
+ * Converts QrDto to QrDomain.
+ */
 fun QrDto.toDomain() = QrDomain(
     id = id,
     redirectUrl = redirectUrl,
@@ -18,7 +20,9 @@ fun QrDto.toDomain() = QrDomain(
     expiresAt = expiresAt,
     createdAt = createdAt
 )
-
+/**
+ * Converts QrDomain to QrDto.
+ */
 fun QrDomain.toDto() = QrDto(
     id = id,
     redirectUrl = redirectUrl,
@@ -29,19 +33,25 @@ fun QrDomain.toDto() = QrDto(
     expiresAt = expiresAt,
     createdAt = createdAt
 )
-
+/**
+ * Converts UserDto to UserDomain.
+ */
 fun UserDto.toDomain(): UserDomain =
     UserDomain(
         id = uid,
         email = email
     )
-
+/**
+ * Converts UserDomain to UserDto.
+ */
 fun UserDomain.toDto(): UserDto =
     UserDto(
         uid = id,
         email = email
     )
-
+/**
+ * Converts QrScanDto to QrScanDomain.
+ */
 fun QrScanDto.toDomain() = QrScanDomain(
     qrId = qrId,
     timestamp = timestamp?.toDate()?.time ?: 0L,
@@ -49,7 +59,9 @@ fun QrScanDto.toDomain() = QrScanDomain(
     state = state,
     city = city
 )
-
+/**
+ * Converts QrScanDomain to QrScanDto.
+ */
 fun QrScanDomain.toDto() = QrScanDto(
     qrId = qrId,
     timestamp = com.google.firebase.Timestamp(timestamp / 1000, 0),

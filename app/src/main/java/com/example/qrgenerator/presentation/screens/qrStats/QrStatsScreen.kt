@@ -42,6 +42,13 @@ import java.util.Date
 import kotlin.math.roundToInt
 
 
+/**
+ * Composable that displays statistics for a given QR code.
+ *
+ * @param qrId The ID of the QR code to show statistics for.
+ * @param viewModel ViewModel handling QR stats logic (default provided by Hilt).
+ * @param onBack Callback when the user presses the back button.
+ */
 @SuppressLint("ConfigurationScreenWidthHeight", "SimpleDateFormat")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +57,7 @@ fun QrStatsScreen(
     viewModel: QrStatsViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
+    // Collect the UI state from the ViewModel
     val uiState by viewModel.uiState.collectAsState(initial = QrStatsUIState.Loading)
     LaunchedEffect(qrId) { viewModel.loadScans(qrId) }
 
@@ -80,6 +88,7 @@ fun QrStatsScreen(
         ) {
             when (uiState) {
                 is QrStatsUIState.Loading -> {
+                    // Show a loader while data is being fetched
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -90,6 +99,7 @@ fun QrStatsScreen(
                     }
                 }
                 is QrStatsUIState.Error -> {
+                    // Show error message if fetching fails
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -103,6 +113,7 @@ fun QrStatsScreen(
                     }
                 }
                 is QrStatsUIState.Success -> {
+                    // Show stats cards once data is loaded
                     val scans = (uiState as QrStatsUIState.Success).scans
 
                     val stats = listOf(

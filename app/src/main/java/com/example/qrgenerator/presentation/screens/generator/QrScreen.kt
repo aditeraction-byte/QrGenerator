@@ -50,13 +50,18 @@ fun QrScreen(
     viewModel: QrViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
+    // Collect the UI state from the ViewModel as a Compose state
     val uiState by viewModel.uiState.collectAsState()
+
+    // Snackbar host to show feedback messages
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Local state for input fields
     var shortlink by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var redirectUrl by remember { mutableStateOf("") }
 
+    // React to changes in UI state and show snackbars accordingly
     LaunchedEffect(uiState) {
         when (uiState) {
             is QrUIState.Success -> snackbarHostState.showSnackbar("QR created!")
@@ -69,6 +74,7 @@ fun QrScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         containerColor = Color.Transparent
     ) { padding ->
+        // Main container with background gradient
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -76,7 +82,6 @@ fun QrScreen(
                 .padding(padding),
             contentAlignment = Alignment.Center
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,6 +89,7 @@ fun QrScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Card container for QR generator content
                 AppCard(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
@@ -93,6 +99,7 @@ fun QrScreen(
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Screen title
                         AppText(
                             text = "QR Generator",
                             style = MaterialTheme.typography.headlineSmall,
@@ -101,8 +108,10 @@ fun QrScreen(
 
                         Spacer(Modifier.height(16.dp))
 
+                        // Calculate QR code size based on screen width
                         val qrSize = LocalConfiguration.current.screenWidthDp.dp * 0.5f
 
+                        // Generate a preview QR bitmap if shortlink is filled
                         val qrBitmapPreview = remember(shortlink) {
                             try {
                                 QrHelper.generateQrBitmap(
@@ -117,11 +126,13 @@ fun QrScreen(
                             }
                         }
 
+                        // Choose bitmap to display: preview or created QR
                         val qrBitmapToShow = when (uiState) {
                             is QrUIState.Success -> (uiState as QrUIState.Success).bitmap
                             else -> qrBitmapPreview
                         }
 
+                        // Display the QR bitmap
                         qrBitmapToShow?.let {
                             Image(
                                 bitmap = it,
@@ -134,6 +145,7 @@ fun QrScreen(
 
                         Spacer(Modifier.height(16.dp))
 
+                        // Input fields for QR creation
                         AppTextField(
                             value = shortlink,
                             onValueChange = { shortlink = it },
@@ -161,6 +173,7 @@ fun QrScreen(
 
                         Spacer(Modifier.height(16.dp))
 
+                        // Button to create the QR code
                         AppButton(
                             onClick = { viewModel.createQr(shortlink, title, redirectUrl) },
                             text = "Create QR",
@@ -170,6 +183,7 @@ fun QrScreen(
 
                         Spacer(Modifier.height(12.dp))
 
+                        // Back button
                         AppButton(
                             onClick = onBack,
                             text = "Back",
@@ -177,6 +191,7 @@ fun QrScreen(
                             containerColor = Color(0xFF7A4DCC)
                         )
 
+                        // Display error message if any
                         if (uiState is QrUIState.Error) {
                             Spacer(Modifier.height(12.dp))
                             AppText(

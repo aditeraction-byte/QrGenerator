@@ -21,10 +21,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-
-
-
-
+/**
+ * Card representing a QR code with image, title, URL, and actions.
+ *
+ * @param title QR code title.
+ * @param url Redirect URL of the QR code.
+ * @param qrBitmap Bitmap image of the QR code.
+ * @param onEdit Lambda executed on edit click.
+ * @param onStats Lambda executed on stats click.
+ * @param onDelete Lambda executed on delete click.
+ * @param modifier Modifier for styling and layout.
+ */
 @Composable
 fun QrCard(
     title: String,

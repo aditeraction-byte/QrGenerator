@@ -16,12 +16,23 @@ import com.example.qrgenerator.presentation.screens.login.LoginScreen
 import com.example.qrgenerator.presentation.screens.qrDetail.QrDetailsScreen
 import com.example.qrgenerator.presentation.screens.qrStats.QrStatsScreen
 
+/**
+ * Sets up the main navigation of the application using Jetpack Compose Navigation.
+ *
+ * Implemented navigation's:
+ * - Login -> Home
+ * - Home -> QrGenerator, QrDetails, QrStats
+ * - QrGenerator -> Home (on back)
+ * - QrDetails -> Home (on back)
+ * - QrStats -> Home (on back)
+ */
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
-    var reloadTrigger by remember { mutableStateOf(false) }
+    var reloadTrigger by remember { mutableStateOf(false) } // Forces recomposition in Home when returning
 
     NavHost(navController = navController, startDestination = Screen.Login.route) {
+        // Login Screen
         composable(Screen.Login.route) {
             LoginScreen(
                 onLoginSuccess = {
@@ -29,7 +40,7 @@ fun AppNavHost() {
                 }
             )
         }
-
+        // Home Screen
         composable(Screen.Home.route) {
             HomeScreen(
                 onCreateQr = { navController.navigate(Screen.QrGenerator.route) },
@@ -43,7 +54,7 @@ fun AppNavHost() {
                 }
             )
         }
-
+        // QR Generator Screen
         composable(Screen.QrGenerator.route) {
             QrScreen(
                 onBack = {
@@ -52,7 +63,7 @@ fun AppNavHost() {
                 }
             )
         }
-
+        // QR Details Screen
         composable(
             route = "qr_details/{qrId}",
             arguments = listOf(navArgument("qrId") { type = NavType.StringType })
@@ -60,7 +71,7 @@ fun AppNavHost() {
             val qrId = backStackEntry.arguments?.getString("qrId") ?: return@composable
             QrDetailsScreen(qrId = qrId, onBack = { navController.popBackStack() })
         }
-
+        // QR Stats Screen
         composable(Screen.QrStats.route) { backStackEntry ->
             val qrId = backStackEntry.arguments?.getString("qrId") ?: ""
             QrStatsScreen(qrId = qrId, onBack = { navController.popBackStack() })

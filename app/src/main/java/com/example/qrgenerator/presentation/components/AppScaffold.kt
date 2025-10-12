@@ -7,7 +7,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-
+/**
+ * Scaffold wrapper providing top bar, FAB, and snackbar host.
+ *
+ * @param topBar Composable for the top bar.
+ * @param floatingActionButton Composable for the FAB.
+ * @param snackbarHostState Snackbar host state for showing snackbars.
+ * @param content Composable content of the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold(

@@ -12,6 +12,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for managing the Home screen state.
+ *
+ * Handles loading the current user, fetching all QR codes,
+ * deleting QR codes, and performing logout.
+ *
+ * @property getAllQrsUseCase Use case to fetch all QR codes for the current user.
+ * @property deleteQrUseCase Use case to delete a specific QR code.
+ * @property authRepository Repository for user authentication operations.
+ */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getAllQrsUseCase: GetAllQrsUseCase,
@@ -30,15 +40,22 @@ class HomeViewModel @Inject constructor(
         loadQrs()
     }
 
+    /** Loads the currently authenticated user into [_user] */
     private fun loadCurrentUser() = viewModelScope.launch {
         _user.value = authRepository.getCurrentUser()
     }
 
+    /**
+     * Logs out the current user and invokes [onComplete] after finishing.
+     *
+     * @param onComplete Optional callback to run after logout.
+     */
     fun logout(onComplete: () -> Unit = {}) = viewModelScope.launch {
         authRepository.logout()
         onComplete()
     }
 
+    /** Loads the list of QR codes and updates [_uiState] accordingly */
     fun loadQrs() = viewModelScope.launch {
         _uiState.value = HomeUIState.Loading
         try {
@@ -49,6 +66,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Deletes a QR code by its ID and refreshes the list.
+     *
+     * @param qrId The ID of the QR code to delete.
+     */
     fun deleteQr(qrId: String) = viewModelScope.launch {
         try {
             deleteQrUseCase(qrId)
